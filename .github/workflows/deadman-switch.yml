@@ -1,0 +1,67 @@
+name: Deadman Switch
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs daily. Cron is UTC time, but the date comparison uses Europe/Brussels.
+    - cron: "5 8 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Brussels
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Decide which index.html should be live
+        shell: bash
+        env:
+          SECRET_INDEX_HTML: ${{ secrets.SECRET_INDEX_HTML }}
+        run: |
+          set -euo pipefail
+
+          TODAY="$(date +%F)"
+          CHECKIN="$(tr -d '\r\n' < checkin.txt || true)"
+
+          echo "Today (Brussels): $TODAY"
+          echo "Check-in date:     $CHECKIN"
+
+          if [[ -z "$CHECKIN" ]]; then
+            echo "checkin.txt is missing or empty -> trigger publishing secret index."
+          fi
+
+          if [[ "$CHECKIN" == "$TODAY" ]]; then
+            echo "✅ Check-in current. Keeping placeholder index."
+            cp index.placeholder.html index.html
+          else
+            echo "⚠️ Check-in stale. Publishing secret index from GitHub Secret."
+            if [[ -z "${SECRET_INDEX_HTML:-}" ]]; then
+              echo "ERROR: SECRET_INDEX_HTML is empty or not set."
+              exit 1
+            fi
+            printf "%s" "$SECRET_INDEX_HTML" > index.html
+          fi
+
+      - name: Commit and push if index.html changed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add index.html
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Deadman switch update"
+          git push
