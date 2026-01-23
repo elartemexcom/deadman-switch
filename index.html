@@ -3,220 +3,73 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>deadman switch</title>
+  <title>Gallery</title>
 
-  <!-- 2013-ish: Roboto era -->
+  <!-- 2013-ish: Roboto/Open Sans era -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      --bg0:#0b1220;
-      --bg1:#0f1a2d;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.62);
-      --accent:#00fff0;
-      --accent2:#8a7dff;
-      --stroke:rgba(255,255,255,.12);
-      --shadow:0 28px 90px rgba(0,0,0,.65);
-      --radius:16px;
-    }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-
-    body{
-      margin:0;
-      font-family:Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 600px at 15% 10%, rgba(0,255,240,.10), transparent 60%),
-        radial-gradient(700px 500px at 85% 20%, rgba(138,125,255,.12), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg0));
-      overflow:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        repeating-linear-gradient(
-          135deg,
-          rgba(255,255,255,.02) 0px,
-          rgba(255,255,255,.02) 6px,
-          transparent 6px,
-          transparent 18px
-        );
-      opacity:.55;
-    }
-
-    .wrap{
-      height:100%;
-      display:grid;
-      place-items:center;
-      padding:22px;
-    }
-
-    .panel{
-      width:min(760px, 96vw);
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.10);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-
-    .top{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      padding:18px 18px 12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.05));
-    }
-
-    .logo{
-      width:46px;
-      height:46px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      font-weight:700;
-      letter-spacing:.2px;
-      color:rgba(0,255,240,.96);
-      border:1px solid rgba(0,255,240,.30);
-      background:linear-gradient(180deg, rgba(0,255,240,.18), rgba(0,255,240,.05));
-      box-shadow:0 16px 50px rgba(0,255,240,.12);
-      user-select:none;
-    }
-
-    h1{
-      margin:0;
-      font-size:18px;
-      font-weight:700;
-      letter-spacing:.4px;
-    }
-
-    .sub{
-      margin:4px 0 0;
-      color:var(--muted);
-      font-size:13px;
-      font-weight:300;
-    }
-
-    .body{
-      padding:18px;
-    }
-
-    .status{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      font-size:12px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.22);
-      color:rgba(255,255,255,.74);
-      white-space:nowrap;
-    }
-
-    .dot{
-      width:10px; height:10px; border-radius:99px;
-      background:rgba(0,255,240,.90);
-      box-shadow:0 0 0 4px rgba(0,255,240,.12);
-    }
-
-    .soon{
-      border-color:rgba(138,125,255,.28);
-    }
-    .soon .dot{
-      background:rgba(138,125,255,.92);
-      box-shadow:0 0 0 4px rgba(138,125,255,.12);
-    }
-
-    .maybe{
-      border-color:rgba(255,255,255,.16);
-    }
-    .maybe .dot{
-      background:rgba(255,255,255,.60);
-      box-shadow:0 0 0 4px rgba(255,255,255,.08);
-    }
-
-    .desc{
-      margin:0;
-      line-height:1.6;
-      font-size:14px;
-      color:rgba(255,255,255,.80);
-    }
-
-    .footer{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 18px 18px;
-      border-top:1px solid rgba(255,255,255,.08);
-      color:rgba(255,255,255,.45);
-      font-size:12px;
-    }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      opacity:.9;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="panel">
-      <div class="top">
-        <div class="logo">◇</div>
-        <div>
-          <h1>deadman switch</h1>
-          <p class="sub">Not dead yet.</p>
+  <header class="topbar">
+    <div class="wrap bar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">◇</div>
+        <div class="titles">
+          <h1>Gallery</h1>
+          <p class="sub">Search by filename. Click any tile for full view.</p>
         </div>
       </div>
 
-      <div class="body">
-        <p class="desc">
-          This page is intentionally minimal. If it ever changes unexpectedly,
-          it means the switch tripped.
-        </p>
+      <div class="controls">
+        <div class="search" role="search">
+          <span class="icon" aria-hidden="true">🔎</span>
+          <input id="q" type="text" placeholder='Search: (12), png, gif, mp4…' autocomplete="off" />
+          <button id="clearBtn" class="clear" type="button" title="Clear">×</button>
+        </div>
+        <div class="pill" id="countPill">Loading…</div>
+      </div>
+    </div>
+  </header>
 
-        <div class="status">
-          <span class="pill">
-            <span class="dot"></span>
-            status: alive
-          </span>
+  <main class="wrap">
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">
+      No matches. Try “(7)”, “png”, “gif”, “mp4”, or “100”.
+    </div>
+  </main>
 
-          <span class="pill soon">
-            <span class="dot"></span>
-            coming soon
-          </span>
-
-          <span class="pill maybe">
-            <span class="dot"></span>
-            maybe.
-          </span>
+  <!-- Lightbox (your app.js requires these IDs + .lb-body) -->
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lb-panel" role="dialog" aria-modal="true" aria-label="Viewer">
+      <div class="lb-bar">
+        <div class="lb-title" id="lbTitle"></div>
+        <div class="lb-actions">
+          <a id="lbOpen" class="btn" href="#" target="_blank" rel="noopener">Open</a>
+          <button id="lbClose" class="btn" type="button">Close (Esc)</button>
         </div>
       </div>
 
-      <div class="footer">
-        <span class="mono">deadman-switch</span>
-        <span>© (future)</span>
+      <div class="lb-body"></div>
+
+      <div class="lb-footer">
+        <span class="hint">Tip: Esc closes. Search filters by filename.</span>
       </div>
     </div>
   </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Optional: clear button for the search bar
+    const q = document.getElementById("q");
+    const clearBtn = document.getElementById("clearBtn");
+    clearBtn.addEventListener("click", () => {
+      q.value = "";
+      q.dispatchEvent(new Event("input"));
+      q.focus();
+    });
+  </script>
 </body>
 </html>
