@@ -1,29 +1,25 @@
 // === CONFIG: change these only ===
 const BASE = "images/";
-const PREFIX = "100";     // "5 (n).ext"
-const MAX = 44;         // <-- change this number anytime
+const PREFIX = "100";     // "100 (n).ext"
+const MAX = 44;           // <-- change this number anytime
 
 // What we will try for each number.
-// These are the common web-friendly formats that GitHub Pages will happily host.
 const EXTS = [
   // Images (still + animated)
-  "png",   // also covers APNG if your PNG is animated
+  "png",
   "jpg",
   "jpeg",
   "gif",
-  "webp",  // can be animated too
+  "webp",
   "avif",
   "svg",
-  "bmp",   // supported by browsers, but usually huge
+  "bmp",
 
   // Video / motion
   "mp4",
   "webm",
-  "ogv"    // Ogg/Theora video (less common, but web-native)
+  "ogv"
 ];
-
-// If you ever add audio too, you can include: "mp3", "wav", "ogg", "m4a"
-// But your current UI is "gallery", so we keep it images + video for now.
 
 // Performance: how many existence-checks to run at once
 const CONCURRENCY = 10;
@@ -43,6 +39,14 @@ const lbClose = document.getElementById("lbClose");
 let lbImg = null;
 let lbVid = null;
 
+// For navigation + key controls:
+let ALL = [];          // full list
+let CURRENT = [];      // current list (filtered or full)
+let currentIndex = -1; // index within CURRENT
+
+// Fit toggle:
+let FIT_MODE = true;   // true = fit, false = full-size native
+
 function filenameFromPath(p){
   return p.split("/").pop();
 }
@@ -50,21 +54,25 @@ function filenameFromPath(p){
 function isVideo(src){
   return /\.(mp4|webm|ogv)$/i.test(src);
 }
-function isImage(src){
-  return /\.(png|jpe?g|gif|webp|avif|svg|bmp)$/i.test(src);
-}
 
 // ====== Lightbox content mount ======
 function ensureLightboxMediaNodes(){
-  // Create once, reuse
   const body = lightbox.querySelector(".lb-body");
 
   if(!lbImg){
     lbImg = document.createElement("img");
     lbImg.id = "lbImg";
     lbImg.alt = "";
+
+    // Optional: click to toggle fit/full-size
+    lbImg.addEventListener("click", () => {
+      FIT_MODE = !FIT_MODE;
+      applyFitMode();
+    });
+
     body.appendChild(lbImg);
   }
+
   if(!lbVid){
     lbVid = document.createElement("video");
     lbVid.id = "lbVid";
@@ -75,16 +83,36 @@ function ensureLightboxMediaNodes(){
   }
 }
 
-function openLightbox(src){
+function lbBody(){
+  return lightbox.querySelector(".lb-body");
+}
+
+function applyFitMode(){
+  // When FIT_MODE is false, we enable "fullsize" mode (native pixels + scroll)
+  lightbox.classList.toggle("fullsize", !FIT_MODE);
+}
+
+function openLightbox(src, idx){
   ensureLightboxMediaNodes();
+
+  // Determine index for left/right navigation
+  if(typeof idx === "number"){
+    currentIndex = idx;
+  } else {
+    currentIndex = CURRENT.indexOf(src);
+  }
 
   const name = filenameFromPath(src);
   lbTitle.textContent = name;
   lbOpen.href = src;
 
+  // Reset scroll to top whenever opening an item
+  lbBody().scrollTop = 0;
+
   // Show the right element
   if(isVideo(src)){
     lbImg.style.display = "none";
+
     lbVid.style.display = "block";
     lbVid.src = src;
     lbVid.currentTime = 0;
@@ -100,6 +128,7 @@ function openLightbox(src){
     lbImg.alt = name;
   }
 
+  applyFitMode();
   lightbox.classList.add("open");
   lightbox.setAttribute("aria-hidden", "false");
   lbClose.focus();
@@ -119,12 +148,67 @@ function closeLightbox(){
   lightbox.setAttribute("aria-hidden", "true");
 }
 
+function showAt(i){
+  if(!CURRENT.length) return;
+  const n = CURRENT.length;
+  const wrapped = (i + n) % n;
+  openLightbox(CURRENT[wrapped], wrapped);
+}
+
+function nextItem(){ showAt(currentIndex + 1); }
+function prevItem(){ showAt(currentIndex - 1); }
+
+// Close on click outside the panel
 lbClose.addEventListener("click", closeLightbox);
 lightbox.addEventListener("click", (e) => {
   if(e.target === lightbox) closeLightbox();
 });
+
+// Keyboard controls
 window.addEventListener("keydown", (e) => {
-  if(e.key === "Escape" && lightbox.classList.contains("open")) closeLightbox();
+  if(!lightbox.classList.contains("open")) return;
+
+  // Escape closes
+  if(e.key === "Escape"){
+    e.preventDefault();
+    closeLightbox();
+    return;
+  }
+
+  // F toggles fit/full-size
+  if(e.key === "f" || e.key === "F"){
+    e.preventDefault();
+    FIT_MODE = !FIT_MODE;
+    applyFitMode();
+    return;
+  }
+
+  // Left/Right navigation
+  if(e.key === "ArrowRight"){
+    e.preventDefault();
+    nextItem();
+    return;
+  }
+  if(e.key === "ArrowLeft"){
+    e.preventDefault();
+    prevItem();
+    return;
+  }
+
+  // Up/Down scroll inside lightbox
+  const scroller = lbBody();
+  const step = e.shiftKey ? 280 : 140;
+
+  if(e.key === "ArrowDown"){
+    e.preventDefault();
+    scroller.scrollBy({ top: step, left: 0, behavior: "smooth" });
+    return;
+  }
+  if(e.key === "ArrowUp"){
+    e.preventDefault();
+    scroller.scrollBy({ top: -step, left: 0, behavior: "smooth" });
+    return;
+  }
 });
 
 // ====== Render cards ======
@@ -151,11 +235,13 @@ function makeThumbElement(src){
 }
 
 function render(items){
+  CURRENT = items; // <-- critical for navigation after filtering
+
   grid.innerHTML = "";
   empty.style.display = items.length ? "none" : "block";
   countPill.textContent = `${items.length} item${items.length===1 ? "" : "s"}`;
 
-  for(const src of items){
+  items.forEach((src, idx) => {
     const card = document.createElement("div");
     card.className = "card";
     card.tabIndex = 0;
@@ -181,19 +267,20 @@ function render(items){
     card.appendChild(thumb);
     card.appendChild(meta);
 
-    const open = () => openLightbox(src);
+    const open = () => openLightbox(src, idx);
     card.addEventListener("click", open);
     card.addEventListener("keydown", (e) => {
-      if(e.key === "Enter" || e.key === " ") open();
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        open();
+      }
     });
 
     grid.appendChild(card);
-  }
+  });
 }
 
 // ====== Search filter ======
-let ALL = [];
-
 function applyFilter(){
   const term = q.value.trim().toLowerCase();
   if(!term){
@@ -208,7 +295,6 @@ function applyFilter(){
 q.addEventListener("input", applyFilter);
 
 // ====== Existence probing ======
-// Fast check: HEAD request. (Same-origin, works on GitHub Pages.)
 async function headExists(url){
   try{
     const res = await fetch(url, { method: "HEAD", cache: "no-store" });
@@ -250,7 +336,6 @@ async function mapLimit(arr, limit, fn){
 
 async function buildGallery(){
   const indices = Array.from({ length: MAX }, (_, k) => k + 1);
-
   countPill.textContent = "Scanning…";
 
   const results = await mapLimit(indices, CONCURRENCY, async (i) => {
