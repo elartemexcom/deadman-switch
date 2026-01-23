@@ -3,25 +3,11 @@ const BASE = "images/";
 const PREFIX = "100";     // "100 (n).ext"
 const MAX = 44;           // <-- change this number anytime
 
-// What we will try for each number.
 const EXTS = [
-  // Images (still + animated)
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "webp",
-  "avif",
-  "svg",
-  "bmp",
-
-  // Video / motion
-  "mp4",
-  "webm",
-  "ogv"
+  "png","jpg","jpeg","gif","webp","avif","svg","bmp",
+  "mp4","webm","ogv"
 ];
 
-// Performance: how many existence-checks to run at once
 const CONCURRENCY = 10;
 
 // ====== UI refs ======
@@ -35,41 +21,30 @@ const lbTitle = document.getElementById("lbTitle");
 const lbOpen = document.getElementById("lbOpen");
 const lbClose = document.getElementById("lbClose");
 
-// We'll swap between these dynamically:
+// Make lightbox focusable (helps keyboard reliability)
+lightbox.tabIndex = -1;
+
 let lbImg = null;
 let lbVid = null;
 
-// For navigation + key controls:
-let ALL = [];          // full list
-let CURRENT = [];      // current list (filtered or full)
-let currentIndex = -1; // index within CURRENT
+let ALL = [];
+let CURRENT = [];
+let currentIndex = -1;
 
-// Fit toggle:
-let FIT_MODE = true;   // true = fit, false = full-size native
+let FIT_MODE = true; // true = fit, false = fullsize
 
-function filenameFromPath(p){
-  return p.split("/").pop();
-}
+function filenameFromPath(p){ return p.split("/").pop(); }
+function isVideo(src){ return /\.(mp4|webm|ogv)$/i.test(src); }
 
-function isVideo(src){
-  return /\.(mp4|webm|ogv)$/i.test(src);
-}
+function lbBody(){ return lightbox.querySelector(".lb-body"); }
 
-// ====== Lightbox content mount ======
 function ensureLightboxMediaNodes(){
-  const body = lightbox.querySelector(".lb-body");
+  const body = lbBody();
 
   if(!lbImg){
     lbImg = document.createElement("img");
     lbImg.id = "lbImg";
     lbImg.alt = "";
-
-    // Optional: click to toggle fit/full-size
-    lbImg.addEventListener("click", () => {
-      FIT_MODE = !FIT_MODE;
-      applyFitMode();
-    });
-
     body.appendChild(lbImg);
   }
 
@@ -81,35 +56,42 @@ function ensureLightboxMediaNodes(){
     lbVid.preload = "metadata";
     body.appendChild(lbVid);
   }
-}
 
-function lbBody(){
-  return lightbox.querySelector(".lb-body");
+  // Click-to-toggle zoom: attach once on the container
+  if(!body.dataset.clickToggleBound){
+    body.dataset.clickToggleBound = "1";
+    body.addEventListener("click", (e) => {
+      // Only toggle when clicking the image itself (not blank area, not video)
+      if(e.target && e.target.id === "lbImg" && lbImg.style.display !== "none"){
+        FIT_MODE = !FIT_MODE;
+        applyFitMode();
+      }
+    });
+  }
 }
 
 function applyFitMode(){
-  // When FIT_MODE is false, we enable "fullsize" mode (native pixels + scroll)
   lightbox.classList.toggle("fullsize", !FIT_MODE);
 }
 
 function openLightbox(src, idx){
   ensureLightboxMediaNodes();
 
-  // Determine index for left/right navigation
+  // Set index for navigation
   if(typeof idx === "number"){
     currentIndex = idx;
   } else {
     currentIndex = CURRENT.indexOf(src);
   }
+  if(currentIndex < 0) currentIndex = 0;
 
   const name = filenameFromPath(src);
   lbTitle.textContent = name;
   lbOpen.href = src;
 
-  // Reset scroll to top whenever opening an item
+  // Reset scroll when opening a new item
   lbBody().scrollTop = 0;
 
-  // Show the right element
   if(isVideo(src)){
     lbImg.style.display = "none";
 
@@ -131,13 +113,14 @@ function openLightbox(src, idx){
   applyFitMode();
   lightbox.classList.add("open");
   lightbox.setAttribute("aria-hidden", "false");
-  lbClose.focus();
+
+  // Focus the lightbox so arrow keys always work
+  lightbox.focus();
 }
 
 function closeLightbox(){
   ensureLightboxMediaNodes();
 
-  // Clean up video so audio doesn’t keep going
   lbVid.pause();
   lbVid.removeAttribute("src");
   lbVid.load();
@@ -158,13 +141,13 @@ function showAt(i){
 function nextItem(){ showAt(currentIndex + 1); }
 function prevItem(){ showAt(currentIndex - 1); }
 
-// Close on click outside the panel
+// Close controls
 lbClose.addEventListener("click", closeLightbox);
 lightbox.addEventListener("click", (e) => {
   if(e.target === lightbox) closeLightbox();
 });
 
-// Keyboard controls
+// KEYBOARD: capture = true so it works even if search input has focus
 window.addEventListener("keydown", (e) => {
   if(!lightbox.classList.contains("open")) return;
 
@@ -175,7 +158,7 @@ window.addEventListener("keydown", (e) => {
     return;
   }
 
-  // F toggles fit/full-size
+  // F toggles fit/fullsize
   if(e.key === "f" || e.key === "F"){
     e.preventDefault();
     FIT_MODE = !FIT_MODE;
@@ -186,30 +169,34 @@ window.addEventListener("keydown", (e) => {
   // Left/Right navigation
   if(e.key === "ArrowRight"){
     e.preventDefault();
+    e.stopPropagation();
     nextItem();
     return;
   }
   if(e.key === "ArrowLeft"){
     e.preventDefault();
+    e.stopPropagation();
     prevItem();
     return;
   }
 
   // Up/Down scroll inside lightbox
   const scroller = lbBody();
-  const step = e.shiftKey ? 280 : 140;
+  const step = e.shiftKey ? 300 : 150;
 
   if(e.key === "ArrowDown"){
     e.preventDefault();
+    e.stopPropagation();
     scroller.scrollBy({ top: step, left: 0, behavior: "smooth" });
     return;
   }
   if(e.key === "ArrowUp"){
     e.preventDefault();
+    e.stopPropagation();
     scroller.scrollBy({ top: -step, left: 0, behavior: "smooth" });
     return;
   }
-});
+}, true);
 
 // ====== Render cards ======
 function makeThumbElement(src){
@@ -219,7 +206,7 @@ function makeThumbElement(src){
     v.muted = true;
     v.loop = true;
     v.playsInline = true;
-    v.autoplay = true;         // animated preview
+    v.autoplay = true;
     v.preload = "metadata";
     v.style.width = "100%";
     v.style.height = "100%";
@@ -235,7 +222,7 @@ function makeThumbElement(src){
 }
 
 function render(items){
-  CURRENT = items; // <-- critical for navigation after filtering
+  CURRENT = items;
 
   grid.innerHTML = "";
   empty.style.display = items.length ? "none" : "block";
@@ -317,7 +304,6 @@ async function findFirstExistingForIndex(i){
   return null;
 }
 
-// Concurrency helper
 async function mapLimit(arr, limit, fn){
   const out = [];
   let idx = 0;
