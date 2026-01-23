@@ -16,7 +16,7 @@
 
 *{ box-sizing:border-box; }
 
-html, body{ height: 100%; }
+html, body{ height:100%; }
 
 body{
   margin:0;
@@ -302,20 +302,20 @@ body::before{
 }
 .btn:hover{ border-color: rgba(0,255,240,.22); }
 
-/* IMPORTANT: this area scrolls for tall images */
+/* SCROLL AREA (this is what arrows scroll) */
 .lb-body{
   flex: 1 1 auto;
   min-height: 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   padding: 14px;
   background: rgba(0,0,0,.25);
-  overflow: auto;            /* <-- allows scroll */
+  overflow: auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* FIT MODE (default): scale image to fit inside panel */
-.lb-body img{
+/* FIT MODE (default): keep the whole image on-screen if possible */
+#lbImg{
   display:block;
   max-width: 100%;
   max-height: 100%;
@@ -324,10 +324,10 @@ body::before{
   border-radius: 12px;
   background: rgba(0,0,0,.20);
   cursor: zoom-in;
+  pointer-events: auto;
 }
 
-/* Videos stay fit */
-.lb-body video{
+#lbVid{
   display:block;
   max-width: 100%;
   max-height: 100%;
@@ -339,13 +339,24 @@ body::before{
 
 /* FULLSIZE MODE: native pixels, scroll if needed */
 .lightbox.fullsize .lb-body{
-  align-items: flex-start;
+  align-items: flex-start; /* start at top */
 }
 
-.lightbox.fullsize .lb-body img{
+.lightbox.fullsize #lbImg{
   max-width: none;
   max-height: none;
   cursor: zoom-out;
+}
+
+/* Optional: better scrollbars (Chrome/Edge) */
+.lb-body::-webkit-scrollbar{ width: 10px; height: 10px; }
+.lb-body::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.18);
+  border-radius: 999px;
+  border: 2px solid rgba(0,0,0,.35);
+}
+.lb-body::-webkit-scrollbar-thumb:hover{
+  background: rgba(0,255,240,.22);
 }
 
 .lb-footer{
@@ -365,4 +376,5 @@ body::before{
   .wrap{ padding: 14px; }
   .lb-title{ max-width: 58%; }
   .grid{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .lb-panel{ height: min(96vh, 980px); }
 }
