@@ -1,137 +1,46 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>archive</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  const gallery = document.getElementById("gallery");
 
-  <style>
-    body{
-      margin:0;
-      padding:40px 20px;
-      background:#f4f0e6;
-      color:#2a2a2a;
-      font-family: Georgia, "Times New Roman", serif;
-    }
-    .wrap{max-width:980px;margin:0 auto;}
-    h1{
-      text-align:center;
-      font-weight:normal;
-      letter-spacing:1px;
-      margin:0 0 8px 0;
-    }
-    .sub{
-      text-align:center;
-      font-size:13px;
-      color:#7a6f5a;
-      margin:0 0 44px 0;
-    }
-    .gallery{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:26px;
-    }
-    figure{
-      margin:0;
-      background:#fff;
-      padding:8px;
-      border:1px solid #cfc6b4;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    }
-    img{
-      width:100%;
-      height:auto;
-      display:block;
-    }
-    figcaption{
-      margin-top:8px;
-      font-size:12px;
-      color:#8b7f67;
-      word-break:break-word;
-    }
-    footer{
-      margin-top:64px;
-      text-align:center;
-      font-size:12px;
-      color:#8b7f67;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>archive</h1>
-    <p class="sub">no feed · no sorting · only finding</p>
+  const MAX_N = 82;
+  const EXTS = ["jpg", "jpeg", "png"];
 
-    <div id="gallery" class="gallery"></div>
+  function tryLoad(src) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
 
-    <footer>./images</footer>
-  </div>
+  async function loadIndex(n) {
+    const base = (n === 0) ? "img" : `img (${n})`;
 
-  <script>
-    const gallery = document.getElementById("gallery");
+    for (const ext of EXTS) {
+      const file = `${base}.${ext}`;
+      const src = `images/${encodeURIComponent(file)}`;
 
-    // You said you believe it goes to ~70
-    const MAX_N = 70;
-
-    // Only these extensions
-    const EXTS = ["jpg", "jpeg", "png"];
-
-    // Encode each path segment so spaces/parentheses work
-    function encodePath(path) {
-      return path.split("/").map(encodeURIComponent).join("/");
-    }
-
-    function tryLoad(src) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.loading = "lazy";
-        img.decoding = "async";
-        img.onload = () => resolve(img);
-        img.onerror = () => resolve(null);
-        img.src = src;
-      });
-    }
-
-    async function addIfExists(file) {
-      // Use relative path so it works on GitHub Pages project sites too
-      const src = encodePath(`./images/${file}`);
       const img = await tryLoad(src);
-      if (!img) return false;
+      if (img) {
+        const fig = document.createElement("figure");
+        fig.appendChild(img);
 
-      const fig = document.createElement("figure");
-      fig.appendChild(img);
+        const cap = document.createElement("figcaption");
+        cap.textContent = file;
+        fig.appendChild(cap);
 
-      const cap = document.createElement("figcaption");
-      cap.textContent = file;
-      fig.appendChild(cap);
-
-      gallery.appendChild(fig);
-      return true;
-    }
-
-    async function loadNumber(n) {
-      // Try both Windows patterns:
-      // "img (20)" and "img(20)"
-      const bases = [`img (${n})`, `img(${n})`];
-
-      for (const base of bases) {
-        for (const ext of EXTS) {
-          await addIfExists(`${base}.${ext}`);
-        }
+        gallery.appendChild(fig);
+        // ⚠️ no return — keep going
       }
     }
+  }
 
-    (async () => {
-      // Optional: if you have a plain img.jpg/img.png too
-      for (const ext of EXTS) {
-        await addIfExists(`img.${ext}`);
-      }
-
-      // Now numbered: img (1) ... img (70) and img(1) ... img(70)
-      for (let i = 1; i <= MAX_N; i++) {
-        await loadNumber(i);
-      }
-    })();
-  </script>
-</body>
-</html>
+  (async () => {
+    await loadIndex(0);
+    for (let i = 1; i <= MAX_N; i++) {
+      await loadIndex(i);
+    }
+  })();
+</script>
