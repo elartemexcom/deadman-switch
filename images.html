@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>archive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body{
+      margin:0;
+      padding:40px 20px;
+      background:#f4f0e6;
+      color:#2a2a2a;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .wrap{max-width:980px;margin:0 auto;}
+    h1{
+      text-align:center;
+      font-weight:normal;
+      letter-spacing:1px;
+      margin:0 0 8px 0;
+    }
+    .sub{
+      text-align:center;
+      font-size:13px;
+      color:#7a6f5a;
+      margin:0 0 44px 0;
+    }
+    .gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:26px;
+    }
+    figure{
+      margin:0;
+      background:#fff;
+      padding:8px;
+      border:1px solid #cfc6b4;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    img{width:100%;height:auto;display:block;}
+    figcaption{
+      margin-top:8px;
+      font-size:12px;
+      color:#8b7f67;
+      word-break:break-word;
+    }
+    footer{
+      margin-top:64px;
+      text-align:center;
+      font-size:12px;
+      color:#8b7f67;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>archive</h1>
+    <p class="sub">no feed · no sorting · only finding</p>
+
+    <div id="gallery" class="gallery"></div>
+
+    <footer>root/images · windows names welcome</footer>
+  </div>
+
+  <script>
+    const gallery = document.getElementById("gallery");
+
+    // Adjust if you have more/less
+    const MAX_N = 82;
+
+    // Put your most common formats first for faster hits
+    const EXTS = ["jpg","jpeg","png","webp","gif","bmp","tiff","avif"];
+
+    function tryLoad(src) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.loading = "lazy";
+        img.decoding = "async";
+
+        img.onload = () => resolve({ ok: true, img });
+        img.onerror = () => resolve({ ok: false });
+
+        img.src = src;
+      });
+    }
+
+    async function loadOneIndex(n) {
+      // n = 0 means "img.ext" (no (n))
+      const baseName = (n === 0) ? "img" : `img (${n})`;
+
+      for (const ext of EXTS) {
+        // Important: encodeURIComponent handles spaces + parentheses safely
+        const file = `${baseName}.${ext}`;
+        const src = `images/${encodeURIComponent(file)}`;
+
+        const res = await tryLoad(src);
+        if (res.ok) {
+          const fig = document.createElement("figure");
+          fig.appendChild(res.img);
+
+          // Optional: show filename like old-school galleries
+          const cap = document.createElement("figcaption");
+          cap.textContent = file;
+          fig.appendChild(cap);
+
+          gallery.appendChild(fig);
+          return true; // found one
+        }
+      }
+      return false; // no extension matched
+    }
+
+    (async function main() {
+      // Try the original first, then 1..MAX_N
+      await loadOneIndex(0);
+
+      for (let i = 1; i <= MAX_N; i++) {
+        await loadOneIndex(i);
+      }
+    })();
+  </script>
+</body>
+</html>
