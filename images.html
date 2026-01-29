@@ -6,55 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body{
-      margin:0;
-      padding:40px 20px;
-      background:#f4f0e6;
-      color:#2a2a2a;
-      font-family: Georgia, "Times New Roman", serif;
-    }
+    body{margin:0;padding:40px 20px;background:#f4f0e6;color:#2a2a2a;font-family:Georgia,"Times New Roman",serif;}
     .wrap{max-width:980px;margin:0 auto;}
-    h1{
-      text-align:center;
-      font-weight:normal;
-      letter-spacing:1px;
-      margin:0 0 8px 0;
-    }
-    .sub{
-      text-align:center;
-      font-size:13px;
-      color:#7a6f5a;
-      margin:0 0 44px 0;
-    }
-    .gallery{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:26px;
-    }
-    figure{
-      margin:0;
-      background:#fff;
-      padding:8px;
-      border:1px solid #cfc6b4;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
-    }
-    img{
-      width:100%;
-      height:auto;
-      display:block;
-    }
-    figcaption{
-      margin-top:8px;
-      font-size:12px;
-      color:#8b7f67;
-      word-break:break-word;
-    }
-    footer{
-      margin-top:64px;
-      text-align:center;
-      font-size:12px;
-      color:#8b7f67;
-    }
+    h1{text-align:center;font-weight:normal;letter-spacing:1px;margin:0 0 8px 0;}
+    .sub{text-align:center;font-size:13px;color:#7a6f5a;margin:0 0 44px 0;}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:26px;}
+    figure{margin:0;background:#fff;padding:8px;border:1px solid #cfc6b4;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+    img{width:100%;height:auto;display:block;}
+    figcaption{margin-top:8px;font-size:12px;color:#8b7f67;word-break:break-word;}
+    footer{margin-top:64px;text-align:center;font-size:12px;color:#8b7f67;}
   </style>
 </head>
 <body>
@@ -70,26 +30,35 @@
   <script>
     const gallery = document.getElementById("gallery");
 
-    // Set this to your highest (n). Includes img (n) where n=1..MAX_N plus the base "img"
     const MAX_N = 82;
-
-    // Only these extensions, and it will load *all that exist* for each number
     const EXTS = ["jpg", "jpeg", "png"];
 
-    function tryLoad(src) {
+    // Tries BOTH Windows styles:
+    // "img (1).jpg" and "img(1).jpg"
+    function candidatesFor(n) {
+      if (n === 0) return ["img"];
+      return [`img (${n})`, `img(${n})`];
+    }
+
+    function tryLoad(url) {
       return new Promise(resolve => {
         const img = new Image();
         img.loading = "lazy";
         img.decoding = "async";
         img.onload = () => resolve(img);
         img.onerror = () => resolve(null);
-        img.src = src;
+        img.src = url;
       });
     }
 
     async function addIfExists(file) {
-      const src = `images/${encodeURIComponent(file)}`;
-      const img = await tryLoad(src);
+      // Use relative path from index.html -> ./images/
+      const rawPath = `./images/${file}`;
+      const url = rawPath.split("/").map(part => encodeURIComponent(part)).join("/");
+
+      console.log("Trying:", url);
+
+      const img = await tryLoad(url);
       if (!img) return false;
 
       const fig = document.createElement("figure");
@@ -104,22 +73,19 @@
     }
 
     async function loadIndex(n) {
-      const base = (n === 0) ? "img" : `img (${n})`;
-
-      // IMPORTANT: no early return — we want multiple extensions per same number
-      for (const ext of EXTS) {
-        await addIfExists(`${base}.${ext}`);
+      for (const base of candidatesFor(n)) {
+        for (const ext of EXTS) {
+          await addIfExists(`${base}.${ext}`);
+        }
       }
     }
 
     (async () => {
-      // First try the base: img.jpg / img.jpeg / img.png
       await loadIndex(0);
-
-      // Then numbered: img (1).* through img (82).*
       for (let i = 1; i <= MAX_N; i++) {
         await loadIndex(i);
       }
+      console.log("Done. If nothing loaded, check folder name/case and filenames.");
     })();
   </script>
 </body>
