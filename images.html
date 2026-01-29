@@ -2,188 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>The Future</title>
+  <title>archive</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    :root{
-      --paper:#f4f0e6;
-      --ink:#2a2a2a;
-      --warm:#7a6f5a;
-      --edge:#cfc6b4;
-      --link:#6f5b3a;
-      --shadow:rgba(0,0,0,0.08);
-    }
-
     body{
       margin:0;
-      padding:44px 20px;
-      background: var(--paper);
-      color: var(--ink);
+      padding:40px 20px;
+      background:#f4f0e6;
+      color:#2a2a2a;
       font-family: Georgia, "Times New Roman", serif;
     }
-
-    .wrap{ max-width: 980px; margin: 0 auto; }
-
-    header{
-      text-align:center;
-      margin-bottom: 44px;
-    }
-
+    .wrap{max-width:980px;margin:0 auto;}
     h1{
-      margin:0 0 6px 0;
-      font-weight: normal;
-      letter-spacing: 1px;
-      font-size: 44px;
-      line-height: 1;
+      text-align:center;
+      font-weight:normal;
+      letter-spacing:1px;
+      margin:0 0 8px 0;
     }
-
     .sub{
-      margin:0;
-      font-size: 14px;
-      color: var(--warm);
-      letter-spacing: 0.6px;
+      text-align:center;
+      font-size:13px;
+      color:#7a6f5a;
+      margin:0 0 44px 0;
     }
-
     .gallery{
       display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 26px;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:26px;
     }
-
     figure{
       margin:0;
       background:#fff;
-      padding: 8px;
-      border: 1px solid var(--edge);
-      box-shadow: 0 4px 12px var(--shadow);
+      padding:8px;
+      border:1px solid #cfc6b4;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
     }
-
     img{
       width:100%;
       height:auto;
       display:block;
     }
-
     figcaption{
-      margin-top: 8px;
-      font-size: 12px;
-      color: #8b7f67;
-      word-break: break-word;
-      line-height: 1.25;
+      margin-top:8px;
+      font-size:12px;
+      color:#8b7f67;
+      word-break:break-word;
     }
-
-    figcaption a{
-      color: var(--link);
-      text-decoration: none;
-      border-bottom: 1px dotted #b6a17a;
-    }
-    figcaption a:hover{
-      border-bottom-style: solid;
-    }
-
     footer{
-      margin-top: 66px;
+      margin-top:64px;
       text-align:center;
-      font-size: 12px;
-      color: #8b7f67;
-    }
-
-    /* tiny nostalgic flourish */
-    .rule{
-      width: 180px;
-      height: 1px;
-      background: #d8cfbf;
-      margin: 14px auto 12px;
+      font-size:12px;
+      color:#8b7f67;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <h1>The Future</h1>
-      <div class="rule"></div>
-      <p class="sub">Time Traveler</p>
-    </header>
+    <h1>archive</h1>
+    <p class="sub">no feed · no sorting · only finding</p>
 
     <div id="gallery" class="gallery"></div>
 
-    <footer>/images · windows-style numbering accepted</footer>
+    <footer>root/images</footer>
   </div>
 
   <script>
     const gallery = document.getElementById("gallery");
 
-    // If you *don’t* know the max, set this comfortably high.
-    const MAX_N = 200;
+    // Set this to your highest (n). Includes img (n) where n=1..MAX_N plus the base "img"
+    const MAX_N = 82;
 
-    // Stop after N consecutive missing indices (so it doesn't loop forever).
-    const STOP_AFTER_MISSES = 25;
+    // Only these extensions, and it will load *all that exist* for each number
+    const EXTS = ["jpg", "jpeg", "png"];
 
-    // Broad extension list (browser support varies, but this covers "just about anything" practical).
-    const EXTS = [
-      "jpg","jpeg","png","webp","gif","avif","svg",
-      "bmp","tif","tiff",
-      "jfif","pjpeg","pjp",
-      "ico","cur",
-      "apng"
-      // You can add more, but many "raw/pro" formats won't preview in browsers.
-    ];
-
-    function tryLoadImage(src){
+    function tryLoad(src) {
       return new Promise(resolve => {
         const img = new Image();
         img.loading = "lazy";
         img.decoding = "async";
-        img.onload = () => resolve({ ok:true, img });
-        img.onerror = () => resolve({ ok:false });
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
         img.src = src;
       });
     }
 
-    function addFigure(previewImg, file, href){
+    async function addIfExists(file) {
+      const src = `images/${encodeURIComponent(file)}`;
+      const img = await tryLoad(src);
+      if (!img) return false;
+
       const fig = document.createElement("figure");
-      fig.appendChild(previewImg);
+      fig.appendChild(img);
 
       const cap = document.createElement("figcaption");
-      const a = document.createElement("a");
-      a.href = href;
-      a.textContent = file;
-      a.target = "_blank";
-      a.rel = "noopener";
-      cap.appendChild(a);
-
+      cap.textContent = file;
       fig.appendChild(cap);
+
       gallery.appendChild(fig);
+      return true;
     }
 
-    async function loadIndex(n){
-      const baseName = (n === 0) ? "img" : `img (${n})`;
+    async function loadIndex(n) {
+      const base = (n === 0) ? "img" : `img (${n})`;
 
-      for (const ext of EXTS){
-        const file = `${baseName}.${ext}`;
-        const src = `images/${encodeURIComponent(file)}`;
-
-        const res = await tryLoadImage(src);
-        if (res.ok){
-          addFigure(res.img, file, src);
-          return true;
-        }
+      // IMPORTANT: no early return — we want multiple extensions per same number
+      for (const ext of EXTS) {
+        await addIfExists(`${base}.${ext}`);
       }
-      return false;
     }
 
-    (async function main(){
+    (async () => {
+      // First try the base: img.jpg / img.jpeg / img.png
       await loadIndex(0);
 
-      let misses = 0;
-      for (let i = 1; i <= MAX_N; i++){
-        const found = await loadIndex(i);
-        if (found) misses = 0;
-        else {
-          misses++;
-          if (misses >= STOP_AFTER_MISSES) break;
-        }
+      // Then numbered: img (1).* through img (82).*
+      for (let i = 1; i <= MAX_N; i++) {
+        await loadIndex(i);
       }
     })();
   </script>
