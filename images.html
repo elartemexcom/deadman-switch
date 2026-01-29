@@ -2,121 +2,188 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>archive</title>
+  <title>The Future</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
+    :root{
+      --paper:#f4f0e6;
+      --ink:#2a2a2a;
+      --warm:#7a6f5a;
+      --edge:#cfc6b4;
+      --link:#6f5b3a;
+      --shadow:rgba(0,0,0,0.08);
+    }
+
     body{
       margin:0;
-      padding:40px 20px;
-      background:#f4f0e6;
-      color:#2a2a2a;
+      padding:44px 20px;
+      background: var(--paper);
+      color: var(--ink);
       font-family: Georgia, "Times New Roman", serif;
     }
-    .wrap{max-width:980px;margin:0 auto;}
+
+    .wrap{ max-width: 980px; margin: 0 auto; }
+
+    header{
+      text-align:center;
+      margin-bottom: 44px;
+    }
+
     h1{
-      text-align:center;
-      font-weight:normal;
-      letter-spacing:1px;
-      margin:0 0 8px 0;
+      margin:0 0 6px 0;
+      font-weight: normal;
+      letter-spacing: 1px;
+      font-size: 44px;
+      line-height: 1;
     }
+
     .sub{
-      text-align:center;
-      font-size:13px;
-      color:#7a6f5a;
-      margin:0 0 44px 0;
+      margin:0;
+      font-size: 14px;
+      color: var(--warm);
+      letter-spacing: 0.6px;
     }
+
     .gallery{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:26px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 26px;
     }
+
     figure{
       margin:0;
       background:#fff;
-      padding:8px;
-      border:1px solid #cfc6b4;
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      padding: 8px;
+      border: 1px solid var(--edge);
+      box-shadow: 0 4px 12px var(--shadow);
     }
-    img{width:100%;height:auto;display:block;}
+
+    img{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+
     figcaption{
-      margin-top:8px;
-      font-size:12px;
-      color:#8b7f67;
-      word-break:break-word;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #8b7f67;
+      word-break: break-word;
+      line-height: 1.25;
     }
+
+    figcaption a{
+      color: var(--link);
+      text-decoration: none;
+      border-bottom: 1px dotted #b6a17a;
+    }
+    figcaption a:hover{
+      border-bottom-style: solid;
+    }
+
     footer{
-      margin-top:64px;
+      margin-top: 66px;
       text-align:center;
-      font-size:12px;
-      color:#8b7f67;
+      font-size: 12px;
+      color: #8b7f67;
+    }
+
+    /* tiny nostalgic flourish */
+    .rule{
+      width: 180px;
+      height: 1px;
+      background: #d8cfbf;
+      margin: 14px auto 12px;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>archive</h1>
-    <p class="sub">no feed · no sorting · only finding</p>
+    <header>
+      <h1>The Future</h1>
+      <div class="rule"></div>
+      <p class="sub">Time Traveler</p>
+    </header>
 
     <div id="gallery" class="gallery"></div>
 
-    <footer>root/images · windows names welcome</footer>
+    <footer>/images · windows-style numbering accepted</footer>
   </div>
 
   <script>
     const gallery = document.getElementById("gallery");
 
-    // Adjust if you have more/less
-    const MAX_N = 82;
+    // If you *don’t* know the max, set this comfortably high.
+    const MAX_N = 200;
 
-    // Put your most common formats first for faster hits
-    const EXTS = ["jpg","jpeg","png","webp","gif","bmp","tiff","avif"];
+    // Stop after N consecutive missing indices (so it doesn't loop forever).
+    const STOP_AFTER_MISSES = 25;
 
-    function tryLoad(src) {
-      return new Promise((resolve) => {
+    // Broad extension list (browser support varies, but this covers "just about anything" practical).
+    const EXTS = [
+      "jpg","jpeg","png","webp","gif","avif","svg",
+      "bmp","tif","tiff",
+      "jfif","pjpeg","pjp",
+      "ico","cur",
+      "apng"
+      // You can add more, but many "raw/pro" formats won't preview in browsers.
+    ];
+
+    function tryLoadImage(src){
+      return new Promise(resolve => {
         const img = new Image();
         img.loading = "lazy";
         img.decoding = "async";
-
-        img.onload = () => resolve({ ok: true, img });
-        img.onerror = () => resolve({ ok: false });
-
+        img.onload = () => resolve({ ok:true, img });
+        img.onerror = () => resolve({ ok:false });
         img.src = src;
       });
     }
 
-    async function loadOneIndex(n) {
-      // n = 0 means "img.ext" (no (n))
+    function addFigure(previewImg, file, href){
+      const fig = document.createElement("figure");
+      fig.appendChild(previewImg);
+
+      const cap = document.createElement("figcaption");
+      const a = document.createElement("a");
+      a.href = href;
+      a.textContent = file;
+      a.target = "_blank";
+      a.rel = "noopener";
+      cap.appendChild(a);
+
+      fig.appendChild(cap);
+      gallery.appendChild(fig);
+    }
+
+    async function loadIndex(n){
       const baseName = (n === 0) ? "img" : `img (${n})`;
 
-      for (const ext of EXTS) {
-        // Important: encodeURIComponent handles spaces + parentheses safely
+      for (const ext of EXTS){
         const file = `${baseName}.${ext}`;
         const src = `images/${encodeURIComponent(file)}`;
 
-        const res = await tryLoad(src);
-        if (res.ok) {
-          const fig = document.createElement("figure");
-          fig.appendChild(res.img);
-
-          // Optional: show filename like old-school galleries
-          const cap = document.createElement("figcaption");
-          cap.textContent = file;
-          fig.appendChild(cap);
-
-          gallery.appendChild(fig);
-          return true; // found one
+        const res = await tryLoadImage(src);
+        if (res.ok){
+          addFigure(res.img, file, src);
+          return true;
         }
       }
-      return false; // no extension matched
+      return false;
     }
 
-    (async function main() {
-      // Try the original first, then 1..MAX_N
-      await loadOneIndex(0);
+    (async function main(){
+      await loadIndex(0);
 
-      for (let i = 1; i <= MAX_N; i++) {
-        await loadOneIndex(i);
+      let misses = 0;
+      for (let i = 1; i <= MAX_N; i++){
+        const found = await loadIndex(i);
+        if (found) misses = 0;
+        else {
+          misses++;
+          if (misses >= STOP_AFTER_MISSES) break;
+        }
       }
     })();
   </script>
