@@ -5,30 +5,35 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>deadman switch</title>
 
-  <!-- 2008–2013-ish: Roboto + subtle "system" feel -->
+  <!-- Old-letter but legible: Cinzel (headings) + Crimson Text (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Text:wght@400;600;700&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg0:#07101c;
-      --bg1:#0b1930;
-      --bg2:#0f2443;
+      /* Mexican parchment / leather / gold */
+      --bg0:#1a120b;      /* deep cacao */
+      --bg1:#2a1a0e;      /* toasted umber */
+      --bg2:#3a2312;      /* warm brown */
 
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.62);
+      --paper0:#f3e6cf;   /* parchment */
+      --paper1:#ead7b7;   /* aged paper */
+      --paper2:#dfc79a;   /* darker edge */
 
-      --accent:#00fff0;
-      --accent2:#8a7dff;
-      --accent3:#ff4fd8;
+      --ink:#2a1a0e;      /* dark ink */
+      --ink2:#3a2312;
+      --muted:rgba(42,26,14,.72);
 
-      --stroke:rgba(255,255,255,.12);
-      --shadow:0 30px 95px rgba(0,0,0,.70);
-      --radius:16px;
+      --red:#8b1b1b;      /* deep founding red */
+      --red2:#b12a2a;
 
-      --glassA:rgba(255,255,255,.10);
-      --glassB:rgba(255,255,255,.04);
+      --gold:#c7a24b;     /* antique gold */
+      --gold2:#e1c36a;
+
+      --stroke:rgba(42,26,14,.18);
+      --shadow:0 28px 85px rgba(0,0,0,.55);
+      --radius:18px;
     }
 
     *{ box-sizing:border-box; }
@@ -36,21 +41,20 @@
 
     body{
       margin:0;
-      font-family:Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      color:var(--text);
+      color:var(--ink);
+      font-family:"Crimson Text", Georgia, serif;
 
-      /* 2008 glossy/aurora + 2013 tech */
+      /* rich mexican browns with subtle gold glow */
       background:
-        radial-gradient(900px 620px at 18% 8%, rgba(0,255,240,.16), transparent 62%),
-        radial-gradient(700px 520px at 78% 16%, rgba(138,125,255,.18), transparent 60%),
-        radial-gradient(820px 680px at 52% 110%, rgba(255,79,216,.12), transparent 58%),
+        radial-gradient(900px 650px at 15% 10%, rgba(225,195,106,.16), transparent 60%),
+        radial-gradient(700px 520px at 85% 18%, rgba(199,162,75,.14), transparent 62%),
         linear-gradient(180deg, var(--bg2), var(--bg0));
 
-      /* allow scrolling so the essay can live under the gallery */
       overflow:auto;
+      padding:26px 18px 60px;
     }
 
-    /* scanlines + soft noise = nostalgic web texture */
+    /* subtle paper grain / old print texture */
     body::before{
       content:"";
       position:fixed;
@@ -58,133 +62,139 @@
       pointer-events:none;
       background:
         repeating-linear-gradient(
-          180deg,
-          rgba(255,255,255,.018) 0px,
-          rgba(255,255,255,.018) 1px,
+          0deg,
+          rgba(0,0,0,.018) 0px,
+          rgba(0,0,0,.018) 1px,
           transparent 2px,
-          transparent 5px
-        );
-      opacity:.45;
+          transparent 6px
+        ),
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.05), transparent 55%),
+        radial-gradient(circle at 70% 60%, rgba(0,0,0,.05), transparent 60%);
+      opacity:.55;
       mix-blend-mode:overlay;
     }
 
-    body::after{
-      content:"";
-      position:fixed;
-      inset:-40px;
-      pointer-events:none;
-      background:
-        radial-gradient(closest-side at 50% 10%, rgba(255,255,255,.06), transparent 70%),
-        radial-gradient(closest-side at 50% 90%, rgba(0,0,0,.38), transparent 70%);
-      opacity:.75;
-      filter: blur(0.2px);
-    }
-
     .wrap{
-      min-height:100%;
-      display:flex;
-      justify-content:center;
-      padding:26px 18px 60px;
-    }
-
-    .stack{
-      width:min(860px, 96vw);
+      width:min(920px, 96vw);
+      margin:0 auto;
       display:flex;
       flex-direction:column;
       gap:18px;
     }
 
-    .panel{
+    /* “document” card: parchment */
+    .panel, .essay{
       border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.12);
-      background:linear-gradient(180deg, var(--glassA), var(--glassB));
+      border:1px solid rgba(199,162,75,.42);
       box-shadow:var(--shadow);
       overflow:hidden;
       position:relative;
+
+      background:
+        radial-gradient(1200px 380px at 50% 0%, rgba(255,255,255,.30), transparent 60%),
+        linear-gradient(180deg, var(--paper0), var(--paper1));
     }
 
-    /* glossy "sheen" */
-    .panel::before{
+    /* aged edges */
+    .panel::after, .essay::after{
       content:"";
       position:absolute;
-      inset:-2px;
+      inset:0;
       pointer-events:none;
       background:
-        linear-gradient(180deg,
-          rgba(255,255,255,.20) 0%,
-          rgba(255,255,255,.06) 18%,
-          transparent 55%);
-      opacity:.55;
+        radial-gradient(closest-side at 0% 0%, rgba(42,26,14,.10), transparent 55%),
+        radial-gradient(closest-side at 100% 0%, rgba(42,26,14,.10), transparent 55%),
+        radial-gradient(closest-side at 0% 100%, rgba(42,26,14,.14), transparent 55%),
+        radial-gradient(closest-side at 100% 100%, rgba(42,26,14,.14), transparent 55%);
+      opacity:.9;
+      mix-blend-mode:multiply;
     }
 
-    .top{
-      display:flex;
-      align-items:center;
-      gap:14px;
+    /* header strip: red + gold, like an official seal */
+    .top, .essay-head{
       padding:18px 18px 12px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-
-      /* 2008 "bevel" header */
+      border-bottom:1px solid rgba(42,26,14,.16);
       background:
-        linear-gradient(180deg,
-          rgba(255,255,255,.20) 0%,
-          rgba(255,255,255,.07) 45%,
-          rgba(0,0,0,.10) 100%);
+        linear-gradient(90deg, rgba(139,27,27,.08), transparent 35%),
+        linear-gradient(180deg, rgba(255,255,255,.35), rgba(0,0,0,.05));
       position:relative;
     }
 
-    .top::after{
+    .top::before, .essay-head::before{
       content:"";
       position:absolute;
-      left:0; right:0; bottom:0;
+      left:0; right:0; top:0;
+      height:4px;
+      background:linear-gradient(90deg, var(--red), var(--gold2), var(--red2));
+      opacity:.95;
+    }
+
+    /* small gold filigree line under header */
+    .top::after, .essay-head::after{
+      content:"";
+      position:absolute;
+      left:18px; right:18px; bottom:0;
       height:1px;
-      background:linear-gradient(90deg, transparent, rgba(0,255,240,.35), rgba(138,125,255,.35), transparent);
-      opacity:.75;
+      background:linear-gradient(90deg, transparent, rgba(199,162,75,.90), transparent);
+      opacity:.9;
     }
 
     .logo{
       width:48px;
       height:48px;
-      border-radius:12px;
+      border-radius:14px;
       display:grid;
       place-items:center;
-      font-weight:900;
-      letter-spacing:.2px;
-      color:rgba(0,255,240,.96);
+      font-family:"Cinzel", serif;
+      font-weight:800;
+      letter-spacing:.4px;
 
-      border:1px solid rgba(0,255,240,.34);
+      color:rgba(139,27,27,.92);
+      border:1px solid rgba(199,162,75,.70);
       background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), transparent 45%),
-        linear-gradient(180deg, rgba(0,255,240,.22), rgba(0,255,240,.06));
+        radial-gradient(circle at 30% 25%, rgba(255,255,255,.55), transparent 45%),
+        linear-gradient(180deg, rgba(225,195,106,.35), rgba(199,162,75,.12));
       box-shadow:
-        0 16px 55px rgba(0,255,240,.14),
-        inset 0 1px 0 rgba(255,255,255,.22);
+        0 18px 55px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.55);
       user-select:none;
-      text-shadow:0 0 18px rgba(0,255,240,.20);
+      text-shadow:0 1px 0 rgba(255,255,255,.35);
+    }
+
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:center;
     }
 
     h1{
       margin:0;
+      font-family:"Cinzel", serif;
       font-size:18px;
-      font-weight:900;
-      letter-spacing:.6px;
+      font-weight:800;
+      letter-spacing:.8px;
+      color:var(--red);
       text-transform:lowercase;
     }
 
     .sub{
       margin:4px 0 0;
-      color:var(--muted);
+      font-family:"Crimson Text", Georgia, serif;
       font-size:13px;
-      font-weight:300;
+      color:rgba(42,26,14,.70);
+      font-weight:600;
+      letter-spacing:.2px;
     }
 
-    .body{ padding:18px; }
+    .body{
+      padding:18px;
+    }
 
     .desc{
       margin:0;
-      line-height:1.7;
-      font-size:14px;
-      color:rgba(255,255,255,.82);
+      line-height:1.85;
+      font-size:15px;
+      color:rgba(42,26,14,.86);
     }
 
     .status{
@@ -201,36 +211,38 @@
       padding:10px 12px;
       border-radius:999px;
       font-size:12px;
-      border:1px solid rgba(255,255,255,.14);
+      border:1px solid rgba(42,26,14,.18);
       background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.10), transparent 55%),
-        rgba(0,0,0,.22);
-      color:rgba(255,255,255,.76);
+        radial-gradient(circle at 25% 20%, rgba(255,255,255,.55), transparent 50%),
+        rgba(255,255,255,.38);
+      color:rgba(42,26,14,.80);
       white-space:nowrap;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+      font-family:Roboto, Arial, sans-serif;
+      letter-spacing:.2px;
     }
 
     .dot{
       width:10px; height:10px;
       border-radius:99px;
-      background:rgba(0,255,240,.90);
-      box-shadow:0 0 0 4px rgba(0,255,240,.12);
+      background:rgba(199,162,75,.95);
+      box-shadow:0 0 0 4px rgba(199,162,75,.18);
     }
 
     .soon{
-      border-color:rgba(138,125,255,.30);
+      border-color:rgba(139,27,27,.24);
     }
     .soon .dot{
-      background:rgba(138,125,255,.92);
-      box-shadow:0 0 0 4px rgba(138,125,255,.12);
+      background:rgba(139,27,27,.90);
+      box-shadow:0 0 0 4px rgba(139,27,27,.16);
     }
 
     .maybe{
-      border-color:rgba(255,255,255,.12);
+      border-color:rgba(42,26,14,.14);
     }
     .maybe .dot{
-      background:rgba(255,255,255,.62);
-      box-shadow:0 0 0 4px rgba(255,255,255,.08);
+      background:rgba(42,26,14,.45);
+      box-shadow:0 0 0 4px rgba(42,26,14,.10);
     }
 
     .footer{
@@ -238,113 +250,90 @@
       justify-content:space-between;
       gap:12px;
       padding:14px 18px 18px;
-      border-top:1px solid rgba(255,255,255,.10);
-      color:rgba(255,255,255,.45);
+      border-top:1px solid rgba(42,26,14,.14);
+      color:rgba(42,26,14,.55);
       font-size:12px;
-      background:linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.14));
+      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.02));
+      font-family:Roboto, Arial, sans-serif;
     }
 
     .mono{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      opacity:.9;
+      opacity:.95;
     }
 
-    /* ===== Essay section under gallery ===== */
+    /* ===== Essay styling: "founding letter" ===== */
 
-    .essay{
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,.12);
-      background:
-        radial-gradient(900px 240px at 30% 0%, rgba(0,255,240,.12), transparent 60%),
-        radial-gradient(760px 260px at 70% 0%, rgba(138,125,255,.12), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-
-    .essay::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      pointer-events:none;
-      background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.06), transparent 55%);
-      opacity:.55;
-    }
-
-    .essay-head{
-      padding:18px 18px 12px;
-      border-bottom:1px solid rgba(255,255,255,.10);
-      background:
-        linear-gradient(180deg,
-          rgba(255,255,255,.18) 0%,
-          rgba(255,255,255,.06) 55%,
-          rgba(0,0,0,.08) 100%);
-    }
-
-    .essay h2{
+    .essay-head h2{
       margin:0;
-      font-size:16px;
-      letter-spacing:.4px;
-      font-weight:900;
+      font-family:"Cinzel", serif;
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.6px;
+      color:var(--red);
     }
 
-    .essay .tag{
+    .essay-head .tag{
       margin:6px 0 0;
       font-size:12px;
-      color:rgba(255,255,255,.60);
-      font-weight:300;
+      color:rgba(42,26,14,.62);
+      font-weight:600;
+      letter-spacing:.2px;
+      font-family:Roboto, Arial, sans-serif;
+      text-transform:uppercase;
     }
 
     .essay-body{
-      padding:16px 18px 18px;
+      padding:18px;
     }
 
     .essay p{
       margin:0 0 12px;
-      line-height:1.85;
-      font-size:14px;
-      color:rgba(255,255,255,.84);
+      line-height:1.95;
+      font-size:16px;
+      color:rgba(42,26,14,.88);
     }
 
     .essay strong{
-      color:rgba(255,255,255,.94);
+      color:rgba(42,26,14,.92);
     }
 
     .essay ul, .essay ol{
-      margin:10px 0 14px 20px;
+      margin:10px 0 14px 22px;
       padding:0;
-      color:rgba(255,255,255,.82);
-      line-height:1.8;
-      font-size:14px;
+      color:rgba(42,26,14,.88);
+      line-height:1.9;
+      font-size:16px;
     }
 
-    .essay li{ margin:6px 0; }
+    .essay li{ margin:7px 0; }
 
     .rule{
       height:1px;
       border:0;
-      margin:14px 0;
-      background:linear-gradient(90deg, transparent, rgba(0,255,240,.35), rgba(138,125,255,.35), transparent);
-      opacity:.85;
+      margin:16px 0;
+      background:linear-gradient(90deg, transparent, rgba(199,162,75,.95), transparent);
+      opacity:.95;
     }
 
     .quote{
       margin-top:14px;
       padding:14px 14px 12px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.14);
+      border:1px solid rgba(199,162,75,.55);
       background:
-        radial-gradient(circle at 20% 0%, rgba(255,255,255,.12), transparent 52%),
-        rgba(0,0,0,.22);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+        radial-gradient(circle at 25% 15%, rgba(255,255,255,.55), transparent 52%),
+        rgba(255,255,255,.35);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.60);
     }
 
     .quote p{
       margin:0;
       font-weight:700;
-      letter-spacing:.1px;
-      color:rgba(255,255,255,.90);
+      letter-spacing:.15px;
+      color:rgba(42,26,14,.90);
+      font-family:"Crimson Text", Georgia, serif;
+      font-size:16px;
     }
 
     /* small-screen tweaks */
@@ -352,147 +341,148 @@
       .top{ padding:16px 14px 10px; }
       .body, .footer, .essay-head, .essay-body{ padding-left:14px; padding-right:14px; }
       .logo{ width:44px; height:44px; }
+      .essay p, .essay ul, .essay ol{ font-size:15px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <div class="stack">
-      <!-- Your "gallery" panel (kept) -->
-      <div class="panel" id="gallery">
-        <div class="top">
-          <div class="logo">◇</div>
-          <div>
-            <h1>deadman switch</h1>
-            <p class="sub">not dead yet.</p>
-          </div>
-        </div>
 
-        <div class="body">
-          <p class="desc">
-            This page is intentionally minimal.
-            If it ever changes unexpectedly, the switch tripped.
-          </p>
-
-          <div class="status">
-            <span class="pill"><span class="dot"></span>status: alive</span>
-            <span class="pill soon"><span class="dot"></span>coming soon</span>
-            <span class="pill maybe"><span class="dot"></span>maybe.</span>
-          </div>
-        </div>
-
-        <div class="footer">
-          <span class="mono">deadman-switch</span>
-          <span>© (future)</span>
+    <!-- “gallery” panel -->
+    <div class="panel" id="gallery">
+      <div class="top">
+        <div class="logo">◇</div>
+        <div>
+          <h1>deadman switch</h1>
+          <p class="sub">not dead yet.</p>
         </div>
       </div>
 
-      <!-- Essay section directly under gallery -->
-      <section class="essay" id="la-nueva-raza">
-        <div class="essay-head">
-          <h2>La Nueva Raza: An Aesthetic Reorientation</h2>
-          <div class="tag">a memo beneath the gallery, stamped in gradients and honesty</div>
+      <div class="body">
+        <p class="desc">
+          This page is intentionally minimal.
+          If it ever changes unexpectedly, the switch tripped.
+        </p>
+
+        <div class="status">
+          <span class="pill"><span class="dot"></span>status: alive</span>
+          <span class="pill soon"><span class="dot"></span>coming soon</span>
+          <span class="pill maybe"><span class="dot"></span>maybe.</span>
         </div>
+      </div>
 
-        <div class="essay-body">
-          <p>La Raza Cósmica emerged with emancipatory intent, yet it remained tethered to the gravity of its era. Its vision of unity still orbited European standards, spiritual abstractions, and the idea that the “Indio” must dissolve into a future synthesis to be redeemed. Whiteness was no longer supreme, but it remained the silent measure. Beauty, when acknowledged, was filtered through marble ideals and metaphysical yearning.</p>
-
-          <p><strong>La Nueva Raza rejects that inheritance.</strong><br>
-          It does not rank peoples. It reorders values.</p>
-
-          <p>At its center is not blood, destiny, or moral uplift, but attractiveness as a primal, cross-cultural force. Beauty here is not a European artifact, not symmetry sanctified by academies, not spirituality disguised as aesthetics. It is the involuntary pull, the bodily recognition that precedes language, ethics, and rational justification.</p>
-
-          <p><strong>In this framework:</strong></p>
-          <ul>
-            <li><strong>African attractiveness</strong> is not required to explain itself to reason. It is allowed to strike directly, rhythmically, viscerally, without apology.</li>
-            <li><strong>Asian attractiveness</strong> is no longer marginalized for failing to conform to Western historical standards. It is elevated precisely because it operates outside them.</li>
-            <li><strong>Indigenous beauty</strong> is not asked to merge, whiten, or vanish into a future ideal. It is recognized as already complete, already capable of commanding longing.</li>
-          </ul>
-
-          <p><strong>La Nueva Raza does not ask, “What must you become?”</strong><br>
-          It asks, “What moves the human animal?”</p>
-
-          <p>History offers its quiet evidence. How many men have turned away from white marble statues, surrounded by the sanctioned ideals of Europe, only to fall irreversibly for doncellas indias? Not out of ideology. Not out of rebellion. But because desire does not vote. It does not obey theory.</p>
-
-          <p><strong>This is the pivot.</strong><br>
-          Beauty becomes sovereign.<br>
-          Not whiteness.<br>
-          Not homogeneity.<br>
-          Not spiritual abstraction.</p>
-
-          <p>Attractiveness is treated as a higher-order signal, one that exposes the falseness of imposed hierarchies. Desire reveals what philosophies try to suppress: that human longing is plural, unruly, and immune to moral engineering.</p>
-
-          <p>La Nueva Raza therefore does not proclaim a new ideal body, nor a new racial destiny. It dismantles the need for one. It affirms that attraction itself, in its many forms, is evidence of equal human potency.</p>
-
-          <p>Not all beauty looks the same.<br>
-          But all beauty commands.<br>
-          And that command, instinctual and undeniable, is the most honest acknowledgment we have.</p>
-
-          <hr class="rule">
-
-          <p><strong>The Principle of Aesthetic Sovereignty</strong><br>
-          <span style="color: rgba(255,255,255,.62); font-weight:300;">(The Spine of La Nueva Raza)</span></p>
-
-          <p>The old racial ideologies survived because they offered certainty. They named an origin, crowned a standard, identified an enemy, and promised a future.</p>
-
-          <p>La Nueva Raza refuses the lie of blood destiny, yet it cannot remain merely corrective. It must explain why it endures, how it spreads, and what it replaces.</p>
-
-          <p><strong>Its answer is Aesthetic Sovereignty.</strong> Where supremacist systems demanded obedience to an abstract ideal, La Nueva Raza recognizes that desire governs behavior more reliably than belief. Nations collapse when their ideals contradict attraction. Civilizations fracture when what they praise is not what they love.</p>
-
-          <p>Thus, La Nueva Raza is not a doctrine of race, but of selection without coercion. No group is elevated by decree. No group is diminished by theory. Instead, beauty functions as a decentralized force, operating independently of power, morality, or permission.</p>
-
-          <ol>
-            <li><strong>Against Supremacy</strong><br>
-              Supremacy depends on permanence. La Nueva Raza depends on flux. Beauty is not static. It mutates across climates, histories, and bodies. Any ideology that freezes it into a single form collapses under time. La Nueva Raza is therefore immune to stagnation. It does not defend a look. It defends the right of attraction to exist without explanation.
-            </li>
-            <li><strong>Against La Raza Cósmica</strong><br>
-              Where the cosmic vision demanded synthesis, La Nueva Raza allows parallel excellence. The Indio is not unfinished. The African is not symbolic. The Asian is not peripheral. Each stands complete, not as contributors to a future ideal, but as present sources of longing. No erasure is required for legitimacy.
-            </li>
-            <li><strong>The Replacement of Moral Hierarchy</strong><br>
-              Old ideologies moralized aesthetics. La Nueva Raza naturalizes it. Attractiveness is treated as a signal, not a virtue. It is neither proof of goodness nor justification for dominance. It is simply acknowledged as real, powerful, and formative. By refusing to moralize desire, La Nueva Raza removes the need for repression, resentment, or mythic enemies.
-            </li>
-            <li><strong>The Future Orientation</strong><br>
-              Supremacist ideologies promised salvation through purity. La Nueva Raza promises continuity through recognition. As long as humans feel longing, it persists. As long as attraction escapes doctrine, it survives. There is no final form. No end-state race. No utopia. Only the ongoing affirmation that beauty does not require permission from history.
-            </li>
-          </ol>
-
-          <hr class="rule">
-
-          <p><strong>The Return of the First Man</strong><br>
-          <span style="color: rgba(255,255,255,.62); font-weight:300;">(Desire as Ancestral Memory)</span></p>
-
-          <p>La Nueva Raza does not deny tradition. It acknowledges its staying power precisely because tradition has always served a function: it places distance between the modern man and the first man.</p>
-
-          <p>The first man is not historical. He is internal. He is the figure inside all men who knows without language, who recognizes before reasoning, who desires before permission. Tradition taught men to manage him, to ritualize him, to bury him beneath codes of conduct, honor, restraint, and delayed acknowledgment. This separation was once necessary. Civilization demanded it.</p>
-
-          <p>But La Nueva Raza marks a shift. Men are no longer asked to harrumph in disapproval or hurrah in scripted celebration. They are not asked to nod solemnly at abstractions of equality, destiny, or virtue. They are asked to feel. To be honest. To recognize the stirring that precedes ideology.</p>
-
-          <p>Lust, in this philosophy, is not decadence. It is evidence. It is the telltale signal that the first man has not been extinguished, only disciplined into silence. Where older systems sought to dominate or deny this force, La Nueva Raza treats it as a compass. Not a command, but a revelation.</p>
-
-          <ol>
-            <li><strong>Lust as Recognition, Not Transgression</strong><br>
-              Lust here is not action. It is acknowledgment. It reveals what the body already knows but culture has taught the mind to ignore. When a man feels the pull that bypasses explanation, he is not being summoned to chaos. He is being confronted with truth unmediated by doctrine.
-            </li>
-            <li><strong>The Test of True Beauty</strong><br>
-              True beauty, as La Nueva Raza defines it, is not decorative. It is disruptive. It destabilizes inherited hierarchies. It threatens norms not through rebellion, but through irrelevance. It does not ask to be ranked. It demands to be noticed. A beauty that does not risk anything is ornamental. A beauty that could cause a man to question everything he was told to value is sovereign.
-            </li>
-            <li><strong>The Refusal of Inhibition as Insight</strong><br>
-              La Nueva Raza does not instruct men to act without restraint. It instructs them to stop lying about what restrains them. Inhibitions are acknowledged as tools, not truths. They are mechanisms of order, not measures of reality. By recognizing desire without immediately suppressing it, the modern man reconnects with the continuity of human experience that predates nation, race, and creed.
-            </li>
-            <li><strong>Completion Without Collapse</strong><br>
-              It honors tradition without kneeling to it. It restores the first man without enthroning him. It replaces moral choreography with honest perception. It recognizes lust not as sin, nor as command, but as signal.
-            </li>
-          </ol>
-
-          <p>The old systems told men what they should admire. La Nueva Raza asks what they already do. And in that honesty, stripped of fear and performance, hierarchy dissolves not by force, but by irrelevance. What remains is what has always remained: Recognition. Longing. The unedited human response to beauty standing plainly before him.</p>
-
-          <div class="quote">
-            <p>La Nueva Raza does not claim that all peoples are equal in theory; it demonstrates that hierarchy collapses in practice the moment desire refuses to obey it.</p>
-          </div>
-        </div>
-      </section>
+      <div class="footer">
+        <span class="mono">deadman-switch</span>
+        <span>© (future)</span>
+      </div>
     </div>
+
+    <!-- Essay -->
+    <section class="essay" id="la-nueva-raza">
+      <div class="essay-head">
+        <h2>La Nueva Raza: An Aesthetic Reorientation</h2>
+        <div class="tag">founding memorandum • preserved in ink</div>
+      </div>
+
+      <div class="essay-body">
+        <p>La Raza Cósmica emerged with emancipatory intent, yet it remained tethered to the gravity of its era. Its vision of unity still orbited European standards, spiritual abstractions, and the idea that the “Indio” must dissolve into a future synthesis to be redeemed. Whiteness was no longer supreme, but it remained the silent measure. Beauty, when acknowledged, was filtered through marble ideals and metaphysical yearning.</p>
+
+        <p><strong>La Nueva Raza rejects that inheritance.</strong><br>
+        It does not rank peoples. It reorders values.</p>
+
+        <p>At its center is not blood, destiny, or moral uplift, but attractiveness as a primal, cross-cultural force. Beauty here is not a European artifact, not symmetry sanctified by academies, not spirituality disguised as aesthetics. It is the involuntary pull, the bodily recognition that precedes language, ethics, and rational justification.</p>
+
+        <p><strong>In this framework:</strong></p>
+        <ul>
+          <li><strong>African attractiveness</strong> is not required to explain itself to reason. It is allowed to strike directly, rhythmically, viscerally, without apology.</li>
+          <li><strong>Asian attractiveness</strong> is no longer marginalized for failing to conform to Western historical standards. It is elevated precisely because it operates outside them.</li>
+          <li><strong>Indigenous beauty</strong> is not asked to merge, whiten, or vanish into a future ideal. It is recognized as already complete, already capable of commanding longing.</li>
+        </ul>
+
+        <p><strong>La Nueva Raza does not ask, “What must you become?”</strong><br>
+        It asks, “What moves the human animal?”</p>
+
+        <p>History offers its quiet evidence. How many men have turned away from white marble statues, surrounded by the sanctioned ideals of Europe, only to fall irreversibly for doncellas indias? Not out of ideology. Not out of rebellion. But because desire does not vote. It does not obey theory.</p>
+
+        <p><strong>This is the pivot.</strong><br>
+        Beauty becomes sovereign.<br>
+        Not whiteness.<br>
+        Not homogeneity.<br>
+        Not spiritual abstraction.</p>
+
+        <p>Attractiveness is treated as a higher-order signal, one that exposes the falseness of imposed hierarchies. Desire reveals what philosophies try to suppress: that human longing is plural, unruly, and immune to moral engineering.</p>
+
+        <p>La Nueva Raza therefore does not proclaim a new ideal body, nor a new racial destiny. It dismantles the need for one. It affirms that attraction itself, in its many forms, is evidence of equal human potency.</p>
+
+        <p>Not all beauty looks the same.<br>
+        But all beauty commands.<br>
+        And that command, instinctual and undeniable, is the most honest acknowledgment we have.</p>
+
+        <hr class="rule">
+
+        <p><strong>The Principle of Aesthetic Sovereignty</strong><br>
+        <span style="color: rgba(42,26,14,.68); font-weight:600; font-family:Roboto, Arial, sans-serif; text-transform:uppercase; font-size:12px;">(The Spine of La Nueva Raza)</span></p>
+
+        <p>The old racial ideologies survived because they offered certainty. They named an origin, crowned a standard, identified an enemy, and promised a future.</p>
+
+        <p>La Nueva Raza refuses the lie of blood destiny, yet it cannot remain merely corrective. It must explain why it endures, how it spreads, and what it replaces.</p>
+
+        <p><strong>Its answer is Aesthetic Sovereignty.</strong> Where supremacist systems demanded obedience to an abstract ideal, La Nueva Raza recognizes that desire governs behavior more reliably than belief. Nations collapse when their ideals contradict attraction. Civilizations fracture when what they praise is not what they love.</p>
+
+        <p>Thus, La Nueva Raza is not a doctrine of race, but of selection without coercion. No group is elevated by decree. No group is diminished by theory. Instead, beauty functions as a decentralized force, operating independently of power, morality, or permission.</p>
+
+        <ol>
+          <li><strong>Against Supremacy</strong><br>
+            Supremacy depends on permanence. La Nueva Raza depends on flux. Beauty is not static. It mutates across climates, histories, and bodies. Any ideology that freezes it into a single form collapses under time. La Nueva Raza is therefore immune to stagnation. It does not defend a look. It defends the right of attraction to exist without explanation.
+          </li>
+          <li><strong>Against La Raza Cósmica</strong><br>
+            Where the cosmic vision demanded synthesis, La Nueva Raza allows parallel excellence. The Indio is not unfinished. The African is not symbolic. The Asian is not peripheral. Each stands complete, not as contributors to a future ideal, but as present sources of longing. No erasure is required for legitimacy.
+          </li>
+          <li><strong>The Replacement of Moral Hierarchy</strong><br>
+            Old ideologies moralized aesthetics. La Nueva Raza naturalizes it. Attractiveness is treated as a signal, not a virtue. It is neither proof of goodness nor justification for dominance. It is simply acknowledged as real, powerful, and formative. By refusing to moralize desire, La Nueva Raza removes the need for repression, resentment, or mythic enemies.
+          </li>
+          <li><strong>The Future Orientation</strong><br>
+            Supremacist ideologies promised salvation through purity. La Nueva Raza promises continuity through recognition. As long as humans feel longing, it persists. As long as attraction escapes doctrine, it survives. There is no final form. No end-state race. No utopia. Only the ongoing affirmation that beauty does not require permission from history.
+          </li>
+        </ol>
+
+        <hr class="rule">
+
+        <p><strong>The Return of the First Man</strong><br>
+        <span style="color: rgba(42,26,14,.68); font-weight:600; font-family:Roboto, Arial, sans-serif; text-transform:uppercase; font-size:12px;">(Desire as Ancestral Memory)</span></p>
+
+        <p>La Nueva Raza does not deny tradition. It acknowledges its staying power precisely because tradition has always served a function: it places distance between the modern man and the first man.</p>
+
+        <p>The first man is not historical. He is internal. He is the figure inside all men who knows without language, who recognizes before reasoning, who desires before permission. Tradition taught men to manage him, to ritualize him, to bury him beneath codes of conduct, honor, restraint, and delayed acknowledgment. This separation was once necessary. Civilization demanded it.</p>
+
+        <p>But La Nueva Raza marks a shift. Men are no longer asked to harrumph in disapproval or hurrah in scripted celebration. They are not asked to nod solemnly at abstractions of equality, destiny, or virtue. They are asked to feel. To be honest. To recognize the stirring that precedes ideology.</p>
+
+        <p>Lust, in this philosophy, is not decadence. It is evidence. It is the telltale signal that the first man has not been extinguished, only disciplined into silence. Where older systems sought to dominate or deny this force, La Nueva Raza treats it as a compass. Not a command, but a revelation.</p>
+
+        <ol>
+          <li><strong>Lust as Recognition, Not Transgression</strong><br>
+            Lust here is not action. It is acknowledgment. It reveals what the body already knows but culture has taught the mind to ignore. When a man feels the pull that bypasses explanation, he is not being summoned to chaos. He is being confronted with truth unmediated by doctrine.
+          </li>
+          <li><strong>The Test of True Beauty</strong><br>
+            True beauty, as La Nueva Raza defines it, is not decorative. It is disruptive. It destabilizes inherited hierarchies. It threatens norms not through rebellion, but through irrelevance. It does not ask to be ranked. It demands to be noticed. A beauty that does not risk anything is ornamental. A beauty that could cause a man to question everything he was told to value is sovereign.
+          </li>
+          <li><strong>The Refusal of Inhibition as Insight</strong><br>
+            La Nueva Raza does not instruct men to act without restraint. It instructs them to stop lying about what restrains them. Inhibitions are acknowledged as tools, not truths. They are mechanisms of order, not measures of reality. By recognizing desire without immediately suppressing it, the modern man reconnects with the continuity of human experience that predates nation, race, and creed.
+          </li>
+          <li><strong>Completion Without Collapse</strong><br>
+            It honors tradition without kneeling to it. It restores the first man without enthroning him. It replaces moral choreography with honest perception. It recognizes lust not as sin, nor as command, but as signal.
+          </li>
+        </ol>
+
+        <p>The old systems told men what they should admire. La Nueva Raza asks what they already do. And in that honesty, stripped of fear and performance, hierarchy dissolves not by force, but by irrelevance. What remains is what has always remained: Recognition. Longing. The unedited human response to beauty standing plainly before him.</p>
+
+        <div class="quote">
+          <p>La Nueva Raza does not claim that all peoples are equal in theory; it demonstrates that hierarchy collapses in practice the moment desire refuses to obey it.</p>
+        </div>
+      </div>
+    </section>
+
   </div>
 </body>
 </html>
