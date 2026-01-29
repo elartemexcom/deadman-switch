@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>archive</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     body{margin:0;padding:40px 20px;background:#f4f0e6;color:#2a2a2a;font-family:Georgia,"Times New Roman",serif;}
     .wrap{max-width:980px;margin:0 auto;}
@@ -19,25 +18,22 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Time Travel</h1>
-    <p class="sub">The Future</p>
+    <h1>archive</h1>
+    <p class="sub">no feed · no sorting · only finding</p>
 
     <div id="gallery" class="gallery"></div>
 
-    <footer>root/images</footer>
+    <footer>./images</footer>
   </div>
 
   <script>
     const gallery = document.getElementById("gallery");
-
     const MAX_N = 82;
-    const EXTS = ["jpg", "jpeg", "png"];
+    const EXTS = ["jpg","jpeg","png"];
 
-    // Tries BOTH Windows styles:
-    // "img (1).jpg" and "img(1).jpg"
-    function candidatesFor(n) {
-      if (n === 0) return ["img"];
-      return [`img (${n})`, `img(${n})`];
+    function encodePath(p){
+      // encodes each segment safely (spaces, parentheses)
+      return p.split("/").map(encodeURIComponent).join("/");
     }
 
     function tryLoad(url) {
@@ -51,41 +47,39 @@
       });
     }
 
-    async function addIfExists(file) {
-      // Use relative path from index.html -> ./images/
-      const rawPath = `./images/${file}`;
-      const url = rawPath.split("/").map(part => encodeURIComponent(part)).join("/");
-
-      console.log("Trying:", url);
-
+    async function add(file) {
+      const url = encodePath(`./images/${file}`);
       const img = await tryLoad(url);
       if (!img) return false;
 
       const fig = document.createElement("figure");
-      fig.appendChild(img);
-
       const cap = document.createElement("figcaption");
       cap.textContent = file;
-      fig.appendChild(cap);
 
+      fig.appendChild(img);
+      fig.appendChild(cap);
       gallery.appendChild(fig);
       return true;
     }
 
-    async function loadIndex(n) {
-      for (const base of candidatesFor(n)) {
-        for (const ext of EXTS) {
-          await addIfExists(`${base}.${ext}`);
-        }
-      }
+    function bases(n){
+      if (n === 0) return ["img"];
+      return [`img (${n})`, `img(${n})`]; // handles both spacing styles
     }
 
     (async () => {
-      await loadIndex(0);
-      for (let i = 1; i <= MAX_N; i++) {
-        await loadIndex(i);
+      // Also prints helpful info
+      console.log("Gallery starting. Looking in ./images/");
+
+      for (let n = 0; n <= MAX_N; n++) {
+        for (const b of bases(n)) {
+          for (const ext of EXTS) {
+            await add(`${b}.${ext}`);
+          }
+        }
       }
-      console.log("Done. If nothing loaded, check folder name/case and filenames.");
+
+      console.log("Gallery finished.");
     })();
   </script>
 </body>
