@@ -3,8 +3,8 @@ name: Deadman Switch
 on:
   workflow_dispatch:
   schedule:
-    # Runs daily. Cron is UTC time, but the date comparison uses Europe/Brussels.
-    - cron: "5 8 * * *"
+    # Runs every 2 minutes (cron is always UTC)
+    - cron: "*/2 * * * *"
 
 permissions:
   contents: write
@@ -13,7 +13,7 @@ jobs:
   switch:
     runs-on: ubuntu-latest
     env:
-      TZ: Europe/Brussels
+      TZ: America/Chicago   # Texas / Central Time for date logic
 
     steps:
       - name: Checkout repo
@@ -29,18 +29,18 @@ jobs:
           TODAY="$(date +%F)"
           CHECKIN="$(tr -d '\r\n' < checkin.txt || true)"
 
-          echo "Today (Brussels): $TODAY"
-          echo "Check-in date:     $CHECKIN"
+          echo "Today (Texas): $TODAY"
+          echo "Check-in date: $CHECKIN"
 
           if [[ -z "$CHECKIN" ]]; then
-            echo "checkin.txt is missing or empty -> trigger publishing secret index."
+            echo "checkin.txt missing or empty -> publishing secret index."
           fi
 
           if [[ "$CHECKIN" == "$TODAY" ]]; then
             echo "✅ Check-in current. Keeping placeholder index."
             cp index.placeholder.html index.html
           else
-            echo "⚠️ Check-in stale. Publishing secret index from GitHub Secret."
+            echo "⚠️ Check-in stale. Publishing secret index."
             if [[ -z "${SECRET_INDEX_HTML:-}" ]]; then
               echo "ERROR: SECRET_INDEX_HTML is empty or not set."
               exit 1
