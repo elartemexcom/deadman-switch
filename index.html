@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>deadman switch</title>
+  <title>La Nueva Raza</title>
 
   <!-- Old-letter but legible: Cinzel (headings) + Crimson Text (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Text:wght@400;600;700&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -19,19 +19,16 @@
 
       --paper0:#f3e6cf;   /* parchment */
       --paper1:#ead7b7;   /* aged paper */
-      --paper2:#dfc79a;   /* darker edge */
 
       --ink:#2a1a0e;      /* dark ink */
-      --ink2:#3a2312;
       --muted:rgba(42,26,14,.72);
 
-      --red:#8b1b1b;      /* deep founding red */
+      --red:#8b1b1b;      /* founding red */
       --red2:#b12a2a;
 
       --gold:#c7a24b;     /* antique gold */
       --gold2:#e1c36a;
 
-      --stroke:rgba(42,26,14,.18);
       --shadow:0 28px 85px rgba(0,0,0,.55);
       --radius:18px;
     }
@@ -44,7 +41,6 @@
       color:var(--ink);
       font-family:"Crimson Text", Georgia, serif;
 
-      /* rich mexican browns with subtle gold glow */
       background:
         radial-gradient(900px 650px at 15% 10%, rgba(225,195,106,.16), transparent 60%),
         radial-gradient(700px 520px at 85% 18%, rgba(199,162,75,.14), transparent 62%),
@@ -77,13 +73,9 @@
     .wrap{
       width:min(920px, 96vw);
       margin:0 auto;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
     }
 
-    /* “document” card: parchment */
-    .panel, .essay{
+    .doc{
       border-radius:var(--radius);
       border:1px solid rgba(199,162,75,.42);
       box-shadow:var(--shadow);
@@ -96,7 +88,7 @@
     }
 
     /* aged edges */
-    .panel::after, .essay::after{
+    .doc::after{
       content:"";
       position:absolute;
       inset:0;
@@ -110,9 +102,8 @@
       mix-blend-mode:multiply;
     }
 
-    /* header strip: red + gold, like an official seal */
-    .top, .essay-head{
-      padding:18px 18px 12px;
+    .head{
+      padding:20px 18px 12px;
       border-bottom:1px solid rgba(42,26,14,.16);
       background:
         linear-gradient(90deg, rgba(139,27,27,.08), transparent 35%),
@@ -120,7 +111,7 @@
       position:relative;
     }
 
-    .top::before, .essay-head::before{
+    .head::before{
       content:"";
       position:absolute;
       left:0; right:0; top:0;
@@ -129,8 +120,7 @@
       opacity:.95;
     }
 
-    /* small gold filigree line under header */
-    .top::after, .essay-head::after{
+    .head::after{
       content:"";
       position:absolute;
       left:18px; right:18px; bottom:0;
@@ -139,166 +129,38 @@
       opacity:.9;
     }
 
-    .logo{
-      width:48px;
-      height:48px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      font-family:"Cinzel", serif;
-      font-weight:800;
-      letter-spacing:.4px;
-
-      color:rgba(139,27,27,.92);
-      border:1px solid rgba(199,162,75,.70);
-      background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,.55), transparent 45%),
-        linear-gradient(180deg, rgba(225,195,106,.35), rgba(199,162,75,.12));
-      box-shadow:
-        0 18px 55px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.55);
-      user-select:none;
-      text-shadow:0 1px 0 rgba(255,255,255,.35);
-    }
-
-    .top{
-      display:flex;
-      gap:14px;
-      align-items:center;
-    }
-
     h1{
       margin:0;
       font-family:"Cinzel", serif;
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
-      letter-spacing:.8px;
+      letter-spacing:.7px;
       color:var(--red);
-      text-transform:lowercase;
     }
 
-    .sub{
-      margin:4px 0 0;
-      font-family:"Crimson Text", Georgia, serif;
-      font-size:13px;
-      color:rgba(42,26,14,.70);
-      font-weight:600;
-      letter-spacing:.2px;
+    .tag{
+      margin:8px 0 0;
+      font-size:12px;
+      color:rgba(42,26,14,.62);
+      font-weight:700;
+      letter-spacing:.25px;
+      text-transform:uppercase;
     }
 
     .body{
       padding:18px;
     }
 
-    .desc{
-      margin:0;
-      line-height:1.85;
-      font-size:15px;
-      color:rgba(42,26,14,.86);
-    }
-
-    .status{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      font-size:12px;
-      border:1px solid rgba(42,26,14,.18);
-      background:
-        radial-gradient(circle at 25% 20%, rgba(255,255,255,.55), transparent 50%),
-        rgba(255,255,255,.38);
-      color:rgba(42,26,14,.80);
-      white-space:nowrap;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-      font-family:Roboto, Arial, sans-serif;
-      letter-spacing:.2px;
-    }
-
-    .dot{
-      width:10px; height:10px;
-      border-radius:99px;
-      background:rgba(199,162,75,.95);
-      box-shadow:0 0 0 4px rgba(199,162,75,.18);
-    }
-
-    .soon{
-      border-color:rgba(139,27,27,.24);
-    }
-    .soon .dot{
-      background:rgba(139,27,27,.90);
-      box-shadow:0 0 0 4px rgba(139,27,27,.16);
-    }
-
-    .maybe{
-      border-color:rgba(42,26,14,.14);
-    }
-    .maybe .dot{
-      background:rgba(42,26,14,.45);
-      box-shadow:0 0 0 4px rgba(42,26,14,.10);
-    }
-
-    .footer{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      padding:14px 18px 18px;
-      border-top:1px solid rgba(42,26,14,.14);
-      color:rgba(42,26,14,.55);
-      font-size:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.02));
-      font-family:Roboto, Arial, sans-serif;
-    }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      opacity:.95;
-    }
-
-    /* ===== Essay styling: "founding letter" ===== */
-
-    .essay-head h2{
-      margin:0;
-      font-family:"Cinzel", serif;
-      font-size:18px;
-      font-weight:800;
-      letter-spacing:.6px;
-      color:var(--red);
-    }
-
-    .essay-head .tag{
-      margin:6px 0 0;
-      font-size:12px;
-      color:rgba(42,26,14,.62);
-      font-weight:600;
-      letter-spacing:.2px;
-      font-family:Roboto, Arial, sans-serif;
-      text-transform:uppercase;
-    }
-
-    .essay-body{
-      padding:18px;
-    }
-
-    .essay p{
+    p{
       margin:0 0 12px;
       line-height:1.95;
       font-size:16px;
       color:rgba(42,26,14,.88);
     }
 
-    .essay strong{
-      color:rgba(42,26,14,.92);
-    }
+    strong{ color:rgba(42,26,14,.94); }
 
-    .essay ul, .essay ol{
+    ul, ol{
       margin:10px 0 14px 22px;
       padding:0;
       color:rgba(42,26,14,.88);
@@ -306,7 +168,7 @@
       font-size:16px;
     }
 
-    .essay li{ margin:7px 0; }
+    li{ margin:7px 0; }
 
     .rule{
       height:1px;
@@ -314,6 +176,22 @@
       margin:16px 0;
       background:linear-gradient(90deg, transparent, rgba(199,162,75,.95), transparent);
       opacity:.95;
+    }
+
+    .subhead{
+      font-family:"Cinzel", serif;
+      font-weight:800;
+      color:var(--red);
+      letter-spacing:.4px;
+    }
+
+    .note{
+      color:rgba(42,26,14,.68);
+      font-weight:700;
+      font-size:12px;
+      letter-spacing:.2px;
+      text-transform:uppercase;
+      margin-left:6px;
     }
 
     .quote{
@@ -332,60 +210,27 @@
       font-weight:700;
       letter-spacing:.15px;
       color:rgba(42,26,14,.90);
-      font-family:"Crimson Text", Georgia, serif;
       font-size:16px;
     }
 
-    /* small-screen tweaks */
     @media (max-width:560px){
-      .top{ padding:16px 14px 10px; }
-      .body, .footer, .essay-head, .essay-body{ padding-left:14px; padding-right:14px; }
-      .logo{ width:44px; height:44px; }
-      .essay p, .essay ul, .essay ol{ font-size:15px; }
+      .head{ padding:18px 14px 10px; }
+      .body{ padding:14px; }
+      p, ul, ol{ font-size:15px; }
+      h1{ font-size:20px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-
-    <!-- “gallery” panel -->
-    <div class="panel" id="gallery">
-      <div class="top">
-        <div class="logo">◇</div>
-        <div>
-          <h1>deadman switch</h1>
-          <p class="sub">not dead yet.</p>
-        </div>
-      </div>
+    <article class="doc">
+      <header class="head">
+        <h1>La Nueva Raza: An Aesthetic Reorientation</h1>
+        <div class="tag">founding memorandum • preserved in ink</div>
+      </header>
 
       <div class="body">
-        <p class="desc">
-          This page is intentionally minimal.
-          If it ever changes unexpectedly, the switch tripped.
-        </p>
-
-        <div class="status">
-          <span class="pill"><span class="dot"></span>status: alive</span>
-          <span class="pill soon"><span class="dot"></span>coming soon</span>
-          <span class="pill maybe"><span class="dot"></span>maybe.</span>
-        </div>
-      </div>
-
-      <div class="footer">
-        <span class="mono">deadman-switch</span>
-        <span>© (future)</span>
-      </div>
-    </div>
-
-    <!-- Essay -->
-    <section class="essay" id="la-nueva-raza">
-      <div class="essay-head">
-        <h2>La Nueva Raza: An Aesthetic Reorientation</h2>
-        <div class="tag">founding memorandum • preserved in ink</div>
-      </div>
-
-      <div class="essay-body">
         <p>La Raza Cósmica emerged with emancipatory intent, yet it remained tethered to the gravity of its era. Its vision of unity still orbited European standards, spiritual abstractions, and the idea that the “Indio” must dissolve into a future synthesis to be redeemed. Whiteness was no longer supreme, but it remained the silent measure. Beauty, when acknowledged, was filtered through marble ideals and metaphysical yearning.</p>
 
         <p><strong>La Nueva Raza rejects that inheritance.</strong><br>
@@ -421,8 +266,9 @@
 
         <hr class="rule">
 
-        <p><strong>The Principle of Aesthetic Sovereignty</strong><br>
-        <span style="color: rgba(42,26,14,.68); font-weight:600; font-family:Roboto, Arial, sans-serif; text-transform:uppercase; font-size:12px;">(The Spine of La Nueva Raza)</span></p>
+        <p><strong class="subhead">The Principle of Aesthetic Sovereignty</strong>
+          <span class="note">(The Spine of La Nueva Raza)</span>
+        </p>
 
         <p>The old racial ideologies survived because they offered certainty. They named an origin, crowned a standard, identified an enemy, and promised a future.</p>
 
@@ -449,8 +295,9 @@
 
         <hr class="rule">
 
-        <p><strong>The Return of the First Man</strong><br>
-        <span style="color: rgba(42,26,14,.68); font-weight:600; font-family:Roboto, Arial, sans-serif; text-transform:uppercase; font-size:12px;">(Desire as Ancestral Memory)</span></p>
+        <p><strong class="subhead">The Return of the First Man</strong>
+          <span class="note">(Desire as Ancestral Memory)</span>
+        </p>
 
         <p>La Nueva Raza does not deny tradition. It acknowledges its staying power precisely because tradition has always served a function: it places distance between the modern man and the first man.</p>
 
@@ -481,8 +328,7 @@
           <p>La Nueva Raza does not claim that all peoples are equal in theory; it demonstrates that hierarchy collapses in practice the moment desire refuses to obey it.</p>
         </div>
       </div>
-    </section>
-
+    </article>
   </div>
 </body>
 </html>
