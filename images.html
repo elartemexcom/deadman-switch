@@ -64,17 +64,22 @@
 
     <div id="gallery" class="gallery"></div>
 
-    <footer>root/images</footer>
+    <footer>./images</footer>
   </div>
 
   <script>
     const gallery = document.getElementById("gallery");
 
-    // Set this to your highest (n). Includes img (n) where n=1..MAX_N plus the base "img"
-    const MAX_N = 82;
+    // You said you believe it goes to ~70
+    const MAX_N = 70;
 
-    // Only these extensions, and it will load *all that exist* for each number
+    // Only these extensions
     const EXTS = ["jpg", "jpeg", "png"];
+
+    // Encode each path segment so spaces/parentheses work
+    function encodePath(path) {
+      return path.split("/").map(encodeURIComponent).join("/");
+    }
 
     function tryLoad(src) {
       return new Promise(resolve => {
@@ -88,7 +93,8 @@
     }
 
     async function addIfExists(file) {
-      const src = `images/${encodeURIComponent(file)}`;
+      // Use relative path so it works on GitHub Pages project sites too
+      const src = encodePath(`./images/${file}`);
       const img = await tryLoad(src);
       if (!img) return false;
 
@@ -103,22 +109,27 @@
       return true;
     }
 
-    async function loadIndex(n) {
-      const base = (n === 0) ? "img" : `img (${n})`;
+    async function loadNumber(n) {
+      // Try both Windows patterns:
+      // "img (20)" and "img(20)"
+      const bases = [`img (${n})`, `img(${n})`];
 
-      // IMPORTANT: no early return — we want multiple extensions per same number
-      for (const ext of EXTS) {
-        await addIfExists(`${base}.${ext}`);
+      for (const base of bases) {
+        for (const ext of EXTS) {
+          await addIfExists(`${base}.${ext}`);
+        }
       }
     }
 
     (async () => {
-      // First try the base: img.jpg / img.jpeg / img.png
-      await loadIndex(0);
+      // Optional: if you have a plain img.jpg/img.png too
+      for (const ext of EXTS) {
+        await addIfExists(`img.${ext}`);
+      }
 
-      // Then numbered: img (1).* through img (82).*
+      // Now numbered: img (1) ... img (70) and img(1) ... img(70)
       for (let i = 1; i <= MAX_N; i++) {
-        await loadIndex(i);
+        await loadNumber(i);
       }
     })();
   </script>
